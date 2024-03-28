@@ -1,0 +1,10 @@
+
+
+Monopoly;Board;4;New;29,99
+Chess;Board;2;Used;9,99
+Mario Kart;Racing;4;New;49,99
+The Witcher 3;RPG;1;New;39,99
+Matador;Board;6;Used;19,95
+Yatzee;Dice;6;Used;14,95
+Matador;Board;6;New;25,95
+

@@ -1,0 +1,106 @@
+@startuml
+class Game {
+  - name: String
+  - genre: String
+  - numberOfPlayers: int
+  - condition: String
+  - price: double
+  - inquiry: Inquiry[]?
+  + AddInquiry(inquiry: Inquiry): void
+  + GetDetails(): String
+  + EditInquiry(inquiry: Inquiry): void
+}
+
+class Inventory {
+  - games: List<Game>
+  + AddGame(game: Game): void
+  + SearchGames(criteria: SearchCriteria): List<Game>
+  + PrintInventoryReport(sortBy: SortCriteria): void
+  + RemoveGame(game: Game): void
+  + EditGame(game: Game): void
+}
+
+class Inquiry {
+  - game: Game
+  - customer: Customer
+  + GetInquiryDetails(): String
+}
+
+class SearchCriteria {
+  - name: String?
+  - genre: String?
+  - minPlayers: int?
+  - maxPlayers: int?
+  - condition: String?
+  - minPrice: double?
+  - maxPrice: double?
+  - inquiry: Bool?
+  + Matches(game: Game): boolean
+}
+
+enum SortCriteria {
+  NAME
+  GENRE
+}
+
+class InventoryReport {
+  - games: List<Game>
+  + GenerateReport(sortBy: SortCriteria): void
+}
+
+class User {
+  - name: String
+  - id: String
+  - password: String
+}
+
+class Customer {
+ - name: String
+ - phoneNum: Int
+ - address: String[]
+ - inquiry: Inquiry[]
+}
+
+User "*"--"1" Inventory: Login >
+Inventory "1" -- "*" Game : contains
+Game "1" -- "*" Inquiry : has
+Inquiry "*" -- "1" Customer: has
+Inventory -- SearchCriteria : uses >
+Inventory -- SortCriteria : uses >
+Inventory -- InventoryReport : generates >
+@enduml
+
+
+
+
+@startuml
+actor User
+participant "UI/Controller" as Controller
+participant Inventory
+participant "SearchCriteria" as Criteria
+participant Game
+participant "InventoryReport" as Report
+
+User -> Controller: searchGames(criteria)
+Controller -> Inventory: searchGames(criteria)
+create Criteria
+Controller -> Criteria: new SearchCriteria(criteria)
+Controller -> Inventory: searchGames(Criteria)
+Inventory -> Criteria: matches(game)
+loop for each game in inventory
+    Criteria --> Inventory: true/false
+end
+Inventory --> Controller: List<Game>(matchingGames)
+Controller --> User: Display matchingGames
+
+User -> Controller: requestInventoryReport(SortCriteria.GENRE)
+Controller -> Inventory: printInventoryReport(SortCriteria.GENRE)
+Inventory -> Report: generateReport(SortCriteria.GENRE)
+loop for each game in sorted order
+    Report -> Inventory: getDetails(game)
+end
+Report --> Inventory: inventoryReport
+Inventory --> Controller: Display inventoryReport
+Controller --> User: Display Report
+
+@enduml
