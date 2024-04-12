@@ -21,7 +21,7 @@ namespace GenSpil
 
         public void AddGame(Game game)
         {
-            string gameData = $"{game.Name};{game.Genre};{game.NumberOfPlayers};{game.Condition};{game.Price}";
+            string gameData = $"{game.Name};{game.Genre};{game.NumberOfPlayers};{game.Condition};{game.Price};{game.HasInqury};{game.CustomerInfoToString(game.Customer)}";
             File.AppendAllLines(filePath, new[] { gameData });
         }
 
@@ -35,7 +35,7 @@ namespace GenSpil
             foreach (var line in lines)
             {
                 var parts = line.Split(';');
-                if (parts.Length == 5)
+                if (parts.Length == 6)
                 {
                     games.Add(new Game
                     {
@@ -43,8 +43,26 @@ namespace GenSpil
                         Genre = parts[1],
                         NumberOfPlayers = int.Parse(parts[2]),
                         Condition = parts[3],
-                        Price = double.Parse(parts[4])
+                        Price = double.Parse(parts[4]),
+                        HasInqury = bool.Parse(parts[5])
                     });
+                }
+            }
+            foreach (var line in lines)
+            {
+                var parts = line.Split(';');
+                if (parts.Length == 7)
+                {
+                    games.Add(new Game
+                    {
+                        Name = parts[0],
+                        Genre = parts[1],
+                        NumberOfPlayers = int.Parse(parts[2]),
+                        Condition = parts[3],
+                        Price = double.Parse(parts[4]),
+                        HasInqury = bool.Parse(parts[5]),
+                        Customer = new Customer(parts[6].Split(", ")[0], parts[6].Split(", ")[1], parts[6].Split(", ")[2], parts[6].Split(", ")[3].Split(", ") )
+                     });
                 }
             }
 

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using System.Xml.Linq;
+﻿
 
 namespace GenSpil
 {
@@ -9,225 +7,92 @@ namespace GenSpil
         static void Main(string[] args)
         {
             DataHandler dataHandler = new DataHandler();
+            Game game = new Game();
+            InventoryReport inventoryReport = new InventoryReport();
+            User user = new User();
             bool exit = false;
             bool isLogedIn = false;
+            int selectedIndex = 0;
+            string[] options = {
+            "Add a game to the inventory",
+            "Search for games",
+            "Print the inventory report",
+            "Add a User to the Program",
+            "Exit"
+            };
 
             while (!isLogedIn)
             {
                 Console.WriteLine("Please Login");
-                isLogedIn = LoginToInventory(dataHandler);
+                isLogedIn = user.LoginToInventory(dataHandler);
                 Console.Clear();
             }
 
 
-
-
             while (!exit && isLogedIn)
             {
+                Console.Clear();
                 Console.WriteLine("Choose an option:");
-                Console.WriteLine("1. Add a game to the inventory");
-                Console.WriteLine("2. Search for games");
-                Console.WriteLine("3. Print the inventory report");
-                Console.WriteLine("4. Add a User to the Program");
-                Console.WriteLine("5. Exit");
-                Console.Write("Enter your choice (1-5): ");
-
-                string choice = Console.ReadLine();
-                switch (choice)
+                for (int i = 0; i < options.Length; i++)
                 {
-                    case "1":
-                        Console.Clear();
-                        AddGameToInventory(dataHandler);
+                    if (i == selectedIndex)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.ForegroundColor = ConsoleColor.Black;
+                    }
+
+                    Console.WriteLine($"{i + 1}. {options[i]}");
+
+                    Console.ResetColor();
+                }
+
+                ConsoleKeyInfo key = Console.ReadKey();
+                switch (key.Key)
+                {
+                    case ConsoleKey.UpArrow:
+                        if (selectedIndex > 0) selectedIndex--;
                         break;
-                    case "2":
-                        Console.Clear();
-                        SearchGames(dataHandler);
+                    case ConsoleKey.DownArrow:
+                        if (selectedIndex < options.Length - 1) selectedIndex++;
                         break;
-                    case "3":
-                        Console.Clear();
-                        PrintInventoryReport(dataHandler);
+                    case ConsoleKey.Enter:
+                        PerformAction(selectedIndex, ref exit, ref game, ref dataHandler, ref inventoryReport, ref user);
                         break;
-                    case "4":
-                        Console.Clear();
-                        AddUserToInventory(dataHandler);
+                }
+
+               
+
+
+            }
+
+            static void PerformAction(int selectedIndex, ref bool exit, ref Game game, ref DataHandler dataHandler, ref InventoryReport inventoryReport, ref User user)
+            {
+                switch (selectedIndex)
+                {
+                    case 0:
+
+                        game.AddGameToDatabase(dataHandler);
                         break;
-                    case "5":
+                    case 1:
+
+                        game.SearchGames(dataHandler);
+                        break;
+                    case 2:
+
+                        inventoryReport.PrintInventoryReport(dataHandler);
+                        break;
+                    case 3:
+
+                        user.AddUserToDatabase(dataHandler);
+                        break;
+                    case 4:
                         exit = true;
                         break;
                     default:
-                        Console.Clear();
+
                         Console.WriteLine("Invalid option, please choose again.");
                         break;
                 }
-
-            }
-
-            static bool LoginToInventory(DataHandler dataHandler)
-            {
-
-                UserSearchCriteria criteria = new UserSearchCriteria();
-
-                Console.Write("Enter Name: ");
-                string name = Console.ReadLine();
-
-                Console.Write("Enter Password: ");
-                string password = ReadPassword();
-
-                if (!string.IsNullOrEmpty(name) || !string.IsNullOrEmpty(password))
-                {
-                    criteria.Name = name;
-                    criteria.Password = password;
-                }
-
-                return dataHandler.Login(criteria);
-            }
-
-
-
-            static void AddUserToInventory(DataHandler dataHandler)
-            {
-                Console.Write("Enter Username: ");
-                string userName = Console.ReadLine();
-                string password = "";
-                string repeatPassword = "";
-
-                while (password == "" || repeatPassword == "")
-                {
-                    Console.Write("Enter Password: ");
-                    password = ReadPassword();
-
-                    Console.Write("Repeat Password: ");
-                    repeatPassword = ReadPassword();
-
-                    if (password != repeatPassword)
-                    {
-                        Console.Write("Password do not match! Try again.");
-                        password = "";
-                        repeatPassword = "";
-                    }
-                    else
-                    {
-                        User user = new User
-                        {
-                            Name = userName,
-                            Password = password,
-                            Id = Guid.NewGuid().ToString()
-                        };
-
-                        dataHandler.AddUser(user);
-                        Console.WriteLine("User added successfully.");
-                    }
-
-                }
-
-
-            }
-
-            static void AddGameToInventory(DataHandler dataHandler)
-            {
-                Console.Write("Enter game name: ");
-                string name = Console.ReadLine();
-
-                Console.Write("Enter game genre: ");
-                string genre = Console.ReadLine();
-
-                Console.Write("Enter number of players: ");
-                int numberOfPlayers;
-                while (!int.TryParse(Console.ReadLine(), out numberOfPlayers))
-                {
-                    Console.Write("Please enter a valid number for players: ");
-                }
-
-                Console.Write("Enter game condition (New/Used): ");
-                string condition = Console.ReadLine();
-
-                Console.Write("Enter game price: ");
-                double price;
-                while (!double.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out price))
-                {
-                    Console.Write("Please enter a valid price: ");
-                }
-
-                Game game = new Game
-                {
-                    Name = name,
-                    Genre = genre,
-                    NumberOfPlayers = numberOfPlayers,
-                    Condition = condition,
-                    Price = price
-                };
-
-                dataHandler.AddGame(game);
-                Console.WriteLine("Game added successfully.");
-            }
-
-            static void SearchGames(DataHandler dataHandler)
-            {
-                var criteria = new SearchCriteria();
-
-                Console.Write("Enter a genre to search for (or leave blank to skip): ");
-                var genre = Console.ReadLine();
-                if (!string.IsNullOrEmpty(genre))
-                {
-                    criteria.Genre = genre;
-                }
-
-                var results = dataHandler.SearchGames(criteria);
-                if (results.Count > 0)
-                {
-                    foreach (var game in results)
-                    {
-                        Console.WriteLine(game);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No games found matching the criteria.");
-                }
-            }
-
-            static void PrintInventoryReport(DataHandler dataHandler)
-            {
-                Console.WriteLine("Choose the sort criteria for the report:");
-                Console.WriteLine("1. Name");
-                Console.WriteLine("2. Genre");
-                Console.Write("Enter your choice (1-2): ");
-
-                var choice = Console.ReadLine();
-                SortCriteria sortCriteria = SortCriteria.Name;
-                if (choice == "2")
-                {
-                    sortCriteria = SortCriteria.Genre;
-                }
-
-                dataHandler.PrintInventoryReport(sortCriteria);
-            }
-
-            static string ReadPassword()
-            {
-                string password = "";
-                ConsoleKeyInfo key;
-
-                do
-                {
-                    key = Console.ReadKey(true);
-
-                    // Ignore any key that is not a character or Backspace
-                    if (char.IsLetterOrDigit(key.KeyChar) || char.IsSymbol(key.KeyChar) || char.IsPunctuation(key.KeyChar))
-                    {
-                        password += key.KeyChar;
-                        Console.Write("*");
-                    }
-                    else if (key.Key == ConsoleKey.Backspace && password.Length > 0)
-                    {
-                        // If Backspace is pressed, remove the last character from the password
-                        password = password.Substring(0, password.Length - 1);
-                        Console.Write("\b \b"); // Move the cursor back and erase the last character
-                    }
-                } while (key.Key != ConsoleKey.Enter);
-
-                Console.WriteLine(); // Move to the next line after pressing Enter
-                return password;
             }
         }
     }
