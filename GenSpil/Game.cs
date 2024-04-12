@@ -7,7 +7,8 @@ namespace GenSpil
     {
         public string Name { get; set; }
         public string Genre { get; set; }
-        public int NumberOfPlayers { get; set; }
+        public int MinPlayers { get; set; }
+        public int MaxPlayers { get; set; }
         public string Condition { get; set; }
         public double Price { get; set; }
         public bool HasInqury { get; set; }
@@ -16,8 +17,8 @@ namespace GenSpil
 
         public override string ToString()
         {
-            return $"{Name} ({Genre}) - {Condition}, Players: {NumberOfPlayers}, Price: {Price:C}, hasInqury: {HasInqury}" +
-                $"{(HasInqury ? (", " + CustomerInfoToString(Customer!)) : "")}";
+            return $"{Name} ({Genre}) - {Condition}, Players: {MinPlayers}-{MaxPlayers}, Price: {Price:C}, hasInqury: {HasInqury}" +
+                $"{(HasInqury ? (", " + CustomerInfoToString(Customer!)) : null)}";
         }
 
         public void AddGameToDatabase(DataHandler dataHandler)
@@ -28,12 +29,20 @@ namespace GenSpil
             Console.Write("Enter game genre: ");
             string genre = Console.ReadLine();
 
-            Console.Write("Enter number of players: ");
-            int numberOfPlayers;
-            while (!int.TryParse(Console.ReadLine(), out numberOfPlayers))
+            Console.WriteLine("Enter number of players: ");
+            int minPlayer;
+            int maxPlayer;
+            Console.Write("Min: ");
+            while (!int.TryParse(Console.ReadLine(), out minPlayer))
             {
                 Console.Write("Please enter a valid number for players: ");
             }
+            Console.Write("Max: ");
+            while (!int.TryParse(Console.ReadLine(), out maxPlayer))
+            {
+                Console.Write("Please enter a valid number for players: ");
+            }
+
 
             Console.Write("Enter game condition (New/Used): ");
             string condition = Console.ReadLine();
@@ -60,7 +69,8 @@ namespace GenSpil
             {
                 Name = name,
                 Genre = genre,
-                NumberOfPlayers = numberOfPlayers,
+                MinPlayers = minPlayer,
+                MaxPlayers = maxPlayer,
                 Condition = condition,
                 Price = price,
                 HasInqury = hasInquiry,
@@ -68,9 +78,7 @@ namespace GenSpil
             };
 
             dataHandler.AddGame(game);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Game added successfully.");
-            Console.ForegroundColor = ConsoleColor.White;
+            
         }
 
         public void SearchGames(DataHandler dataHandler)
@@ -104,9 +112,9 @@ namespace GenSpil
                         criteria.Genre = searchKey;
                         break;
                     case 3:
-                        Console.Write("Enter Max number of players: ");
+                        Console.Write("Enter number of players: ");
                         searchKey = Console.ReadLine();
-                        criteria.MaxPlayers = int.Parse(searchKey);
+                        criteria.Players = int.Parse(searchKey);
                         break;
                     case 4:
                         Console.Write("Enter a Condition (used/new): ");
@@ -133,15 +141,25 @@ namespace GenSpil
             var results = dataHandler.SearchGames(criteria);
             if (results.Count > 0)
             {
+                Console.WriteLine("Search result:");
+
+                Console.WriteLine("┌──────────────────────────────────┬────────────────┬────────────┬───────────┬──────────┬──────────┬──────────────────────────────────┐");
+                Console.WriteLine($"│{"Name",-34}│{"Players",-16}│{"Genre",-12}│{"Condition",-11}│{"Price",-10}│{"Has Inqury",-10}│{"Customer",-34}│");
                 foreach (var game in results)
                 {
-                    Console.WriteLine(game);
+                    Console.WriteLine("├──────────────────────────────────┼────────────────┼────────────┼───────────┼──────────┼──────────┼──────────────────────────────────┤");
+                    Console.WriteLine($"│{game.Name,-34}│{game.MinPlayers}-{game.MaxPlayers,-14}│{game.Genre,-12}│{game.Condition,-11}│{game.Price,-10}│{game.HasInqury,-10}│{(game.Customer != null ? game.Customer.Name : null),-34}│");
                 }
+                Console.WriteLine("└──────────────────────────────────┴────────────────┴────────────┴───────────┴──────────┴──────────┴──────────────────────────────────┘");
+                Console.WriteLine();
+
+                Console.ReadLine();
             }
             else
             {
                 Console.WriteLine("No games found matching the criteria.");
             }
+            Console.ReadLine();
         }
 
         static Customer AddCustomerToGame()

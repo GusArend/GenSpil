@@ -1,11 +1,14 @@
 
-Monopoly;Board;4;New;29,99;false
-Chess;Board;2;Used;9,99;false
-Mario Kart;Racing;4;New;49,99;false
-The Witcher 3;RPG;1;New;39,99;false
-Matador;Board;6;Used;19,95;false
-Yatzee;Dice;6;Used;14,95;false
-Matador;Board;6;New;25,95;false
-Matador;Board;6;New;25,95;True;Gustav Rasmussen, 123456789, Gus@gus.com, TestVej 10:1234 TestBy:Danmark
-Matador;Board;6;New;19,99;True;Peter, 12321465, Peter@peter.dk, Testvej 22:2000 testby:danmark
-asdfg;sdfg;6;sdfg;66;False;
+Monopoly;Board;2;4;New;29,99;false
+Chess;Board;2;4;Used;9,99;false
+Mario Kart;Racing;2;4;New;49,99;false
+The Witcher 3;RPG;2;4;New;39,99;false
+Matador;Board;2;4;Used;19,95;false
+Yatzee;Dice;2;4;Used;14,95;false
+Matador;Board;2;4;New;25,95;false
+Matador;Board;2;4;New;25,95;false
+Matador;Board;2;4;New;19,99;false
+Matador;Board;2;4;New;55;false
+
+Risk;Board;2;4;New;36,5;True;Gustav, 123456, Gus@gus.com, TestVej 33:1234 TestBy:Danmark
+Matador;Board;2;8;New;50,95;True;Hans, 123456, Hans@hans.com, Testvej 23:testby:testland

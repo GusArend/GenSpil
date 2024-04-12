@@ -1,3 +1,6 @@
 
-Admin;01;Admin
-Gustav;f5922f42-edcd-4f06-a4ed-bddc7ec326b9;Arend
+Admin;Admin
+1;1
+Gustav;Gustav
+Peter;Peter
+Hans;hans

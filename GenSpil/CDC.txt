@@ -1,73 +1,81 @@
+
 @startuml
 class Game {
-  - name: String
-  - genre: String
-  - numberOfPlayers: int
-  - condition: String
-  - price: double
-  - inquiry: Inquiry[]?
-  + AddInquiry(inquiry: Inquiry): void
-  + GetDetails(): String
-  + EditInquiry(inquiry: Inquiry): void
+  + Name: String
+  + Genre: String
+  + MinPlayers: int
+  + MaxPLayers: int
+  + Condition: String
+  + Price: double
+  + HasInquiry: bool
+  + Customer: Customer?
+  
+  + <<override>> ToString(): string
+  + AddGameToDatabase(datahandler: Datahandler): void
+  + SearchGames(datahandler: Datahandler): void
+  + AddCustomerToGame(): Customer
+
 }
 
-class Inventory {
-  - games: List<Game>
+class DataHandler {
+  - filePath: string
+  - userFilePath: string
+  
   + AddGame(game: Game): void
+  + LoadGames(): List<Game>
   + SearchGames(criteria: SearchCriteria): List<Game>
-  + PrintInventoryReport(sortBy: SortCriteria): void
-  + RemoveGame(game: Game): void
-  + EditGame(game: Game): void
+  + AddUser(user: User): void
+  + LoadUsers(): List<User>
+  + Login(criteria: UserSearchCriteria): bool
+
 }
 
-class Inquiry {
-  - game: Game
-  - customer: Customer
-  + GetInquiryDetails(): String
-}
 
 class SearchCriteria {
-  - name: String?
-  - genre: String?
-  - minPlayers: int?
-  - maxPlayers: int?
-  - condition: String?
-  - minPrice: double?
-  - maxPrice: double?
-  - inquiry: Bool?
-  + Matches(game: Game): boolean
+  + Name: String?
+  + Genre: String?
+  + Players: int?
+  + Condition: String?
+  + MinPrice: double?
+  + MaxPrice: double?
+  + HasInquiry: Bool?
+  + Matches(game: Game): bool
 }
 
-enum SortCriteria {
-  NAME
-  GENRE
-}
+
 
 class InventoryReport {
-  - games: List<Game>
-  + GenerateReport(sortBy: SortCriteria): void
+  + PrintInventoryMenu(games List<Game>): List<Game>
+  - printInventoryByName(games List<Game>): List<Game>
+  - printInventoryByGenre(games List<Game>): List<Game>
+  + PrintInventory(games List<Game>): void
 }
 
 class User {
-  - name: String
-  - id: String
-  - password: String
+  + Name: String
+  + Password: String
+  + AddUserToDatabase(dataHandler: DataHandler)
+  + LoginToInventory(dataHandler: DataHandler): bool
+  - ReadPassword(): string
 }
 
 class Customer {
- - name: String
- - phoneNum: Int
- - address: String[]
- - inquiry: Inquiry[]
+ + Name: string
+ + Email: string
+ + PhoneNum: string
+ + Address: string[]
+ 
+ + Customer(name: string, email: string, phoneNum: string, address: string[])
+ 
 }
 
-User "*"--"1" Inventory: Login >
-Inventory "1" -- "*" Game : contains
-Game "1" -- "*" Inquiry : has
-Inquiry "*" -- "1" Customer: has
-Inventory -- SearchCriteria : uses >
-Inventory -- SortCriteria : uses >
-Inventory -- InventoryReport : generates >
+User "*"--"1" DataHandler: Login >
+DataHandler "1" -- "*" Game : contains
+
+Game "*" -- "1" Customer: has
+DataHandler -- SearchCriteria : uses >
+DataHandler -- SortCriteria : uses >
+DataHandler -- InventoryReport : generates >
 @enduml
 
 

@@ -8,9 +8,6 @@ namespace GenSpil
         public string PhoneNum { get; set; }
         public string[] Address {  get; set; } 
 
-        // private Inquiry[] inquiries;
-
-
         public Customer(string name, string email, string phoneNum,
         string[] address )
         {
@@ -18,7 +15,6 @@ namespace GenSpil
             Email = email;
             PhoneNum = phoneNum;
             Address = address;
-        }
-        
+        } 
     }
 }

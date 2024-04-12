@@ -79,7 +79,8 @@ namespace GenSpil
                         break;
                     case 2:
 
-                        inventoryReport.PrintInventoryReport(dataHandler);
+                        List<Game> sortedGames = inventoryReport.PrintInventoryMenu(dataHandler.LoadGames());
+                        inventoryReport.PrintInventory(sortedGames);
                         break;
                     case 3:
 

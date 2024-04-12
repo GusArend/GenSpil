@@ -6,7 +6,6 @@ namespace GenSpil
     {
         
         public string Name { get; set; }
-        public string Id { get; set; }
         public string Password { get; set; }
 
         public void AddUserToDatabase(DataHandler dataHandler)
@@ -26,7 +25,7 @@ namespace GenSpil
 
                 if (password != repeatPassword)
                 {
-                    Console.Write("Password do not match! Try again.");
+                    Console.WriteLine("Password do not match! Try again.");
                     password = "";
                     repeatPassword = "";
                 }
@@ -36,16 +35,13 @@ namespace GenSpil
                     {
                         Name = userName,
                         Password = password,
-                        Id = Guid.NewGuid().ToString()
+                        
                     };
 
                     dataHandler.AddUser(user);
-                    Console.WriteLine("User added successfully.");
+                    break;
                 }
-
             }
-
-
         }
 
         public bool LoginToInventory(DataHandler dataHandler)
@@ -94,6 +90,8 @@ namespace GenSpil
             Console.WriteLine(); // Move to the next line after pressing Enter
             return password;
         }
+
+       
 
     }
 }

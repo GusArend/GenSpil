@@ -20,9 +20,24 @@ namespace GenSpil
         }
 
         public void AddGame(Game game)
-        {
-            string gameData = $"{game.Name};{game.Genre};{game.NumberOfPlayers};{game.Condition};{game.Price};{game.HasInqury};{game.CustomerInfoToString(game.Customer)}";
-            File.AppendAllLines(filePath, new[] { gameData });
+        {   
+            try
+            {
+                string gameData = $"{game.Name};{game.Genre};{game.MinPlayers};{game.MaxPlayers};{game.Condition};{game.Price};{game.HasInqury}{(game.Customer != null ? ";" + game.CustomerInfoToString(game.Customer) : null)}";
+                File.AppendAllLines(filePath, new[] { gameData });
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Game added successfully.");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.ReadLine();
+            } catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Something went wrong! {e}");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.ReadLine();
+            }
+           
         }
 
         
@@ -35,33 +50,35 @@ namespace GenSpil
             foreach (var line in lines)
             {
                 var parts = line.Split(';');
-                if (parts.Length == 6)
-                {
-                    games.Add(new Game
-                    {
-                        Name = parts[0],
-                        Genre = parts[1],
-                        NumberOfPlayers = int.Parse(parts[2]),
-                        Condition = parts[3],
-                        Price = double.Parse(parts[4]),
-                        HasInqury = bool.Parse(parts[5])
-                    });
-                }
-            }
-            foreach (var line in lines)
-            {
-                var parts = line.Split(';');
                 if (parts.Length == 7)
                 {
                     games.Add(new Game
                     {
                         Name = parts[0],
                         Genre = parts[1],
-                        NumberOfPlayers = int.Parse(parts[2]),
-                        Condition = parts[3],
-                        Price = double.Parse(parts[4]),
-                        HasInqury = bool.Parse(parts[5]),
-                        Customer = new Customer(parts[6].Split(", ")[0], parts[6].Split(", ")[1], parts[6].Split(", ")[2], parts[6].Split(", ")[3].Split(", ") )
+                        MinPlayers = int.Parse(parts[2]),
+                        MaxPlayers = int.Parse(parts[3]),
+                        Condition = parts[4],
+                        Price = double.Parse(parts[5]),
+                        HasInqury = bool.Parse(parts[6])
+                    });
+                }
+            }
+            foreach (var line in lines)
+            {
+                var parts = line.Split(';');
+                if (parts.Length == 8)
+                {
+                    games.Add(new Game
+                    {
+                        Name = parts[0],
+                        Genre = parts[1],
+                        MinPlayers = int.Parse(parts[2]),
+                        MaxPlayers = int.Parse(parts[3]),
+                        Condition = parts[4],
+                        Price = double.Parse(parts[5]),
+                        HasInqury = bool.Parse(parts[6]),
+                        Customer = new Customer(parts[7].Split(", ")[0], parts[7].Split(", ")[1], parts[7].Split(", ")[2], parts[7].Split(", ")[3].Split(", ") )
                      });
                 }
             }
@@ -77,8 +94,49 @@ namespace GenSpil
 
         public void AddUser(User user)
         {
-            string userData = $"{user.Name};{user.Id};{user.Password}";
-            File.AppendAllLines(userFilePath, new[] { userData });
+
+            bool userExists = false;
+            
+                try
+                {
+                    // Læser alle linjer fra brugerfilen og gemmer dem i en List<string>
+                    List<string> lines = File.ReadAllLines(userFilePath).ToList();
+
+                    // Gennemgå hver linje og kontroller om brugernavnet eksisterer.
+                    foreach (string line in lines)
+                    {
+                        // Splitter linjen og gemmer substrings i en List<string>
+                        List<string> userList = line.Split(';').ToList();
+
+                        //Hvis der er match returner metoden true
+                        if (userList.Count > 0 && userList[0] == user.Name)
+                        {
+                            userExists = true; // Brugeren eksisterer allerede
+                        } else
+                        {
+                        //Hvis der ikke er match mellem valgt brugernavn og brugernavne i databasen returner vi false
+                            userExists = false; // Brugeren eksisterer ikke
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Håndtering af fejl under læsning fra filen
+                    Console.WriteLine($"Fejl ved læsning fra filen: {ex.Message}");
+                }
+           
+            if ( !userExists ) {
+                string userData = $"{user.Name};{user.Password}";
+                File.AppendAllLines(userFilePath, new[] { userData });
+
+                Console.WriteLine("User added successfully.");
+            } else
+            {
+                Console.WriteLine("User already exists in the system!");
+            }
+
+            Console.ReadLine();
+            
         }
 
         public List<User> LoadUsers()
@@ -89,13 +147,13 @@ namespace GenSpil
             foreach (var line in lines)
             {
                 var parts = line.Split(';');
-                if (parts.Length == 3)
+                if (parts.Length == 2)
                 {
                     users.Add(new User
                     {
                         Name = parts[0],
-                        Id = parts[1],
-                        Password = parts[2],
+                      
+                        Password = parts[1],
 
 
                     });
@@ -121,20 +179,6 @@ namespace GenSpil
         }
 
 
-        public void PrintInventoryReport(SortCriteria sortBy)
-        {
-            var games = LoadGames();
-            IEnumerable<Game> sortedGames = sortBy switch
-            {
-                SortCriteria.Name => games.OrderBy(g => g.Name),
-                SortCriteria.Genre => games.OrderBy(g => g.Genre),
-                _ => games,
-            };
-
-            foreach (var game in sortedGames)
-            {
-                Console.WriteLine(game);
-            }
-        }
+       
     }
 }
